@@ -215,8 +215,8 @@ if __name__ == "__main__":
     torch.cuda.manual_seed(seed)
     parser.add_argument("--n_cls", type=int, default=2)
 
-    parser.add_argument("--train_tasks", type=str, default="1,2,4.1,4.2,4.5,4.6,7")
-    parser.add_argument("--test_tasks", type=str, default="1,2,4.1,4.2,4.5,4.6,7,8,8.1,8.2,8.3,8.5,8.6,8.7,8.8,10,10.5,10.6")
+    parser.add_argument("--train_tasks", type=str, default="S1,S2,S3,S4,S5,S6,S7")
+    parser.add_argument("--test_tasks", type=str, default="T1,T2,T3,T4,T5,T6")
 
     parser.add_argument("--audio_encoder", type=str, default="operaCT")
     parser.add_argument("--enc_dim", type=int, default=768)

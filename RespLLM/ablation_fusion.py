@@ -289,20 +289,19 @@ class AudioDataset(torch.utils.data.Dataset):
 
 def get_dataloader(configs, task, deft_seed=None, sample=False):
     tasks_config = {
-        "1": ("coviduk", "covid", "exhalation"),
-        "2": ("coviduk", "covid", "cough"),
-        "4.1": ("covid19sounds", "covid", "breath"),
-        "4.2": ("covid19sounds", "covid", "cough"),
-        "4.5": ("covid19sounds", "smoker", "breath"),
-        "4.6": ("covid19sounds", "smoker", "cough"),
-        "7": ("icbhidisease", "copd", "lung"),
-        "7.5": ("icbhi", "event", "lung"),
-        "8.5": ("coswara", "covid", "cough-shallow"),
-        "8.6": ("coswara", "covid", "cough-heavy"),
-        "8.7": ("coswara", "covid", "breathing-shallow"),
-        "8.8": ("coswara", "covid", "breathing-deep"),
-        "10.5": ("kauh", "copd", "lung"),
-        "10.6": ("kauh", "asthma", "lung")
+        "S1": ("coviduk", "covid", "exhalation"),
+        "S2": ("coviduk", "covid", "cough"),
+        "S3": ("covid19sounds", "covid", "breath"),
+        "S4": ("covid19sounds", "covid", "cough"),
+        "S5": ("covid19sounds", "smoker", "breath"),
+        "S6": ("covid19sounds", "smoker", "cough"),
+        "S7": ("icbhidisease", "copd", "lung"),
+        "T1": ("coswara", "covid", "cough-shallow"),
+        "T2": ("coswara", "covid", "cough-heavy"),
+        "T3": ("coswara", "covid", "breathing-shallow"),
+        "T4": ("coswara", "covid", "breathing-deep"),
+        "T5": ("kauh", "copd", "lung"),
+        "T6": ("kauh", "asthma", "lung"),
 
     }
     n_cls = collections.defaultdict(lambda:2, {"11": 5, "12": 5})
@@ -310,25 +309,22 @@ def get_dataloader(configs, task, deft_seed=None, sample=False):
     dataset, label, modality = tasks_config[task]
     
     feature_dirs = {"covid19sounds": "feature/covid19sounds_eval/downsampled/", 
-                    "ssbpr": "feature/snoring_eval/", 
                     "coswara": "feature/coswara_eval/",
                     "coviduk": "feature/coviduk_eval/",
                     "kauh": "feature/kauh_eval/",
-                    "copd": "feature/copd_eval/",
                     "icbhidisease": "feature/icbhidisease_eval/",
                     }
     
     pad_len_htsat = {"covid19sounds": 8.18, 
                     "coswara": 8.18,
                     "coviduk": 8.18,
-                    "copd": 8.18,
                     "kauh": 8.18,
                     "icbhidisease": 8.18,
                     }
     feature_dir = feature_dirs[dataset]
-    if task in ["4.1", "4.2"]:
+    if task in ["S3", "S4"]:
         feature_dir = "feature/covid19sounds_eval/covid_eval/"
-    elif task in ["4.5", "4.6"]:
+    elif task in ["S5", "S6"]:
         feature_dir = "feature/covid19sounds_eval/smoker_eval/"
     
     if dataset in ["ssbpr", "copd", "kauh", "icbhidisease"]:
@@ -380,7 +376,7 @@ def get_dataloader(configs, task, deft_seed=None, sample=False):
             gender = [filename.split("/")[-3] for filename in sound_dir_loc]
             metadata = [{'gender': gender[i]} for i in range(len(gender))]
         elif dataset == "covid19sounds":
-            if task in ["4.1", "4.2"]:
+            if task in ["S3", "S4"]:
                 import glob as gb
                 metadata = []
                 data_df = pd.read_csv("datasets/covid19-sounds/data_0426_en_task2.csv")
@@ -411,7 +407,7 @@ def get_dataloader(configs, task, deft_seed=None, sample=False):
                     except IndexError:
                         print("metadata nonexist", uid, folder_name)
                         metadata.append({} )
-            elif task in ["4.5", "4.6"]:
+            elif task in ["S5", "S6"]:
                 df = pd.read_csv("datasets/covid19-sounds/data_0426_en_task1.csv", delimiter=";", index_col="Uid")
                 # print(df.head(5))
                 df = df[~df.index.duplicated(keep='first')]
@@ -567,7 +563,7 @@ def get_dataloader(configs, task, deft_seed=None, sample=False):
     elif dataset == "covid19sounds":
         y_set = np.load(feature_dir + "data_split.npy")
         
-        if task in ["4.1", "4.2"]:
+        if task in ["S3", "S4"]:
             x_data_train = x_data[y_set == "train"]
             x_metadata_train = x_metadata[y_set == "train"]
             y_label_train = y_label[y_set == "train"]
@@ -722,9 +718,9 @@ def get_dataloader(configs, task, deft_seed=None, sample=False):
         x_metadata_test = x_metadata[y_set == "test"]
         # split = np.load(feature_dir + "split.npy")
     
-    if task in ["4.5", "4.6"]:
+    if task in ["S5", "S6"]:
         x_data_train, x_metadata_train, y_label_train = downsample_balanced_dataset(x_data_train, x_metadata_train, y_label_train)
-    if task in ["7"]:
+    if task in ["S7"]:
         x_data_train, x_metadata_train, y_label_train = upsample_balanced_dataset(x_data_train, x_metadata_train, y_label_train)
 
     train_data_percentage = configs.train_pct

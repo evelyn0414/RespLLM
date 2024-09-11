@@ -109,31 +109,19 @@ def merge_dataloader(dataloaders):
 
 def get_dataloader(configs, task, sample=False, deft_seed=None):
     tasks_config = {
-        "1": ("coviduk", "covid", "exhalation"),
-        "2": ("coviduk", "covid", "cough"),
-        "3": ("covid19sounds", "symptom", "breath"),
-        "4": ("covid19sounds", "symptom", "cough"),
-        "4.1": ("covid19sounds", "covid", "breath"),
-        "4.2": ("covid19sounds", "covid", "cough"),
-        "4.5": ("covid19sounds", "smoker", "breath"),
-        "4.6": ("covid19sounds", "smoker", "cough"),
-        "5": ("coughvid", "covid", "cough"),
-        "6": ("coughvid", "gender", "cough"),
-        "7": ("icbhidisease", "copd", "lung"),
-        "7.5": ("icbhi", "event", "lung"),
-        "8": ("coswara", "smoker", "cough-shallow"),
-        "8.1": ("coswara", "smoker", "cough-heavy"),
-        "8.2": ("coswara", "smoker", "breathing-shallow"),
-        "8.3": ("coswara", "smoker", "breathing-deep"),
-        "8.5": ("coswara", "covid", "cough-shallow"),
-        "8.6": ("coswara", "covid", "cough-heavy"),
-        "8.7": ("coswara", "covid", "breathing-shallow"),
-        "8.8": ("coswara", "covid", "breathing-deep"),
-
-        "9": ("coswara", "sex", "cough-shallow"),
-        "10": ("kauh", "obstructive", "lung"),
-        "10.5": ("kauh", "copd", "lung"),
-        "10.6": ("kauh", "asthma", "lung"),
+        "S1": ("coviduk", "covid", "exhalation"),
+        "S2": ("coviduk", "covid", "cough"),
+        "S3": ("covid19sounds", "covid", "breath"),
+        "S4": ("covid19sounds", "covid", "cough"),
+        "S5": ("covid19sounds", "smoker", "breath"),
+        "S6": ("covid19sounds", "smoker", "cough"),
+        "S7": ("icbhidisease", "copd", "lung"),
+        "T1": ("coswara", "covid", "cough-shallow"),
+        "T2": ("coswara", "covid", "cough-heavy"),
+        "T3": ("coswara", "covid", "breathing-shallow"),
+        "T4": ("coswara", "covid", "breathing-deep"),
+        "T5": ("kauh", "copd", "lung"),
+        "T6": ("kauh", "asthma", "lung"),
 
     }
     n_cls = collections.defaultdict(lambda:2, {"11": 5, "12": 5})
@@ -144,21 +132,19 @@ def get_dataloader(configs, task, sample=False, deft_seed=None):
                     "coswara": "feature/coswara_eval/",
                     "coviduk": "feature/coviduk_eval/",
                     "kauh": "feature/kauh_eval/",
-                    "copd": "feature/copd_eval/",
                     "icbhidisease": "feature/icbhidisease_eval/",
                     }
     
     pad_len_htsat = {"covid19sounds": 8.18, 
                     "coswara": 8.18,
                     "coviduk": 8.18,
-                    "copd": 8.18,
                     "kauh": 8.18,
                     "icbhidisease": 8.18,
                     }
     feature_dir = feature_dirs[dataset]
-    if task in ["4.1", "4.2"]:
+    if task in ["S3", "S4"]:
         feature_dir = "feature/covid19sounds_eval/covid_eval/"
-    elif task in ["4.5", "4.6"]:
+    elif task in ["S5", "S6"]:
         feature_dir = "feature/covid19sounds_eval/smoker_eval/"
     
     if dataset in ["ssbpr", "copd", "kauh", "icbhidisease"]:
@@ -211,7 +197,7 @@ def get_dataloader(configs, task, sample=False, deft_seed=None):
             gender = [filename.split("/")[-3] for filename in sound_dir_loc]
             metadata = [{'gender': gender[i]} for i in range(len(gender))]
         elif dataset == "covid19sounds":
-            if task in ["4.1", "4.2"]:
+            if task in ["S3", "S4"]:
                 import glob as gb
                 metadata = []
                 data_df = pd.read_csv("datasets/covid19-sounds/data_0426_en_task2.csv")
@@ -259,7 +245,7 @@ def get_dataloader(configs, task, sample=False, deft_seed=None):
                     #             "medhistory": df.at[(uid, folder_name), "Medhistory"], 
                     #             "symptoms": df.at[(uid, folder_name), "Symptoms"]
                     #             } )
-            elif task in ["4.5", "4.6"]:
+            elif task in ["S5", "S6"]:
                 df = pd.read_csv("datasets/covid19-sounds/data_0426_en_task1.csv", delimiter=";", index_col="Uid")
                 # print(df.head(5))
                 df = df[~df.index.duplicated(keep='first')]
@@ -436,23 +422,10 @@ def get_dataloader(configs, task, sample=False, deft_seed=None):
     
     print(collections.Counter(y_label))
     
-    if dataset == "ssbpr":
-        train_ratio = 0.6
-        validation_ratio = 0.2
-        test_ratio = 0.2
-        
-        _x_train, x_data_test, _x_metadata_train, x_metadata_test, _y_train, y_label_test = train_test_split(
-                x_data, x_metadata, y_label, test_size=test_ratio, random_state=seed, stratify=y_label
-            )
-
-        x_data_train, x_data_vad, x_metadata_train, x_metadata_vad, y_label_train, y_label_vad = train_test_split(
-                _x_train, _x_metadata_train, _y_train, test_size=validation_ratio/(validation_ratio + train_ratio), 
-                random_state=seed, stratify=_y_train
-            )
-    elif dataset == "covid19sounds":
+    if dataset == "covid19sounds":
         y_set = np.load(feature_dir + "data_split.npy")
         
-        if task in ["4.1", "4.2"]:
+        if task in ["S3", "S4"]:
             x_data_train = x_data[y_set == "train"]
             x_metadata_train = x_metadata[y_set == "train"]
             y_label_train = y_label[y_set == "train"]
@@ -578,10 +551,6 @@ def get_dataloader(configs, task, sample=False, deft_seed=None):
     else:
         if dataset == "coviduk":
             y_set = np.load(feature_dir + "split_{}.npy".format(modality))
-        elif dataset == "copd":
-            y_set = np.load(feature_dir + "train_test_split.npy")
-        elif dataset == "coughvid":
-            y_set = np.load(feature_dir + "split_{}.npy".format(label))
         x_data_train = x_data[y_set == "train"]
         y_label_train = y_label[y_set == "train"]
         x_metadata_train = x_metadata[y_set == "train"]
@@ -596,11 +565,11 @@ def get_dataloader(configs, task, sample=False, deft_seed=None):
         # split = np.load(feature_dir + "split.npy")
 
 
-    if task in ["4.5", "4.6", "10.6"]:
+    if task in ["S5", "S6", "T6"]:
         x_data_train, x_metadata_train, y_label_train = downsample_balanced_dataset(x_data_train, x_metadata_train, y_label_train)
-    if task in ["7"]:
+    if task in ["S7"]:
         x_data_train, x_metadata_train, y_label_train = upsample_balanced_dataset(x_data_train, x_metadata_train, y_label_train)
-    if task in ["10.6"]:
+    if task in ["T6"]:
         x_data_train, x_metadata_train, y_label_train = downsample_balanced_dataset(x_data_train, x_metadata_train, y_label_train)
         x_data_test, x_metadata_test, y_label_test = downsample_balanced_dataset(x_data_test, x_metadata_test, y_label_test)
 
