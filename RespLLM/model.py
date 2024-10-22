@@ -16,7 +16,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 transformers.logging.set_verbosity_error()
 
-token = "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"
+token = "redacted"
 
 OPERA_CT_TARGET_MODULES = ["qkv", "proj"]
 OPERA_CE_TARGET_MODULES = ['conv', 'fc', 'linear']
