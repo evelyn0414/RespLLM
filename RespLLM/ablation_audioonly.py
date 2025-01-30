@@ -19,7 +19,7 @@ from lightning.pytorch.utilities import CombinedLoader
 import time
 from torch import nn
 from torch.nn import functional as F
-from src.benchmark.llm_eval.util import itr_merge, EarlyStopper, downsample_balanced_dataset, upsample_balanced_dataset, set_all_seed
+from src.benchmark.respllm.util import itr_merge, EarlyStopper, downsample_balanced_dataset, upsample_balanced_dataset, set_all_seed
 from src.benchmark.model_util import get_encoder_path, initialize_pretrained_model
 import random
 from torchmetrics import AUROC
