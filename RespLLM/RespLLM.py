@@ -11,9 +11,9 @@ from tqdm import tqdm
 import random
 from sklearn.model_selection import train_test_split
 
-from src.benchmark.llm_eval.model import RespLLM
-from src.benchmark.llm_eval.util import test, get_dataloader, EarlyStopper, set_all_seed
-from src.benchmark.llm_eval.sampler import CategoriesSampler
+from src.benchmark.RespLLM.model import RespLLM
+from src.benchmark.RespLLM.util import test, get_dataloader, EarlyStopper, set_all_seed
+from src.benchmark.RespLLM.sampler import CategoriesSampler
 
 
 # import pytorch_lightning as pl
