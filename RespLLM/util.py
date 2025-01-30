@@ -9,7 +9,7 @@ import os
 import collections
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, ConcatDataset
-from src.benchmark.llm_eval.sampler import CategoriesSampler, SplitCategoriesSampler, TrainCategoriesSampler
+from src.benchmark.RespLLM.sampler import CategoriesSampler, SplitCategoriesSampler, TrainCategoriesSampler
 from src.util import train_test_split_from_list, plot_tsne
 import torch.optim as optim
 import pickle
